@@ -17,6 +17,8 @@ import mate.academy.intro.service.AuthenticationService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +52,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Role userRole = roleRepository.findByName(Role.RoleName.USER).orElseThrow(
                 () -> new RegistrationException("Registration error: "
                         + "could not to continue registration"));
-        if (user.getEmail().startsWith("admin@")) {
+        if (SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .contains(new SimpleGrantedAuthority(Role.RoleName.ADMIN.name()))) {
             Role adminRole = roleRepository.findByName(Role.RoleName.ADMIN).orElseThrow(
                     () -> new RegistrationException("Registration error: "
                             + "could not to continue registration"));

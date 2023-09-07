@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-user-admin
+      author: Vasyl Zeikan
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: admin@admin.com
+
+              - column:
+                  name: password
+                  value: $2a$12$N.Vzk6OAV4RDilLb/aS3qemnaC2wW5UXTCtBx5vUISF6x9tl4mMTS
+
+              - column:
+                  name: first_name
+                  value: ADMIN
+
+              - column:
+                  name: last_name
+                  value: ADMIN
+
+              - column:
+                  name: shipping_address
+                  value: ADMIN
+
+        - sql:
+            dbms: all
+            sql: INSERT INTO users_roles VALUES((SELECT id FROM users WHERE email='admin@admin.com'),(SELECT id FROM roles WHERE name='ADMIN'))
+
+        - sql:
+            dbms: all
+            sql: INSERT INTO users_roles VALUES((SELECT id FROM users WHERE email='admin@admin.com'),(SELECT id FROM roles WHERE name='USER'))
