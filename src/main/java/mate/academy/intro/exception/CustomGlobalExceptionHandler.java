@@ -1,5 +1,6 @@
 package mate.academy.intro.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,11 +13,25 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler({RegistrationException.class,EntityNotFoundException.class})
+    protected ResponseEntity<Object> handleCustomException(
+            Exception ex,
+            HttpServletRequest httpServletRequest) {
+        Map<String,Object> bodyError = new LinkedHashMap<>();
+        bodyError.put("status", HttpStatus.BAD_REQUEST);
+        bodyError.put("timestamp", LocalDateTime.now());
+        bodyError.put("path", httpServletRequest.getServletPath());
+        bodyError.put("message", ex.getMessage());
+        return new ResponseEntity<>(bodyError,
+                new HttpHeaders(), HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value()));
+    }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -42,4 +57,5 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         }
         return e.getDefaultMessage();
     }
+
 }
