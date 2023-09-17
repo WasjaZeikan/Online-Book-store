@@ -7,5 +7,5 @@ import lombok.Data;
 public class ShoppingCartDto {
     private Long id;
     private Long userId;
-    private Set<ShoppingCartItemsDto> cartItems;
+    private Set<ShoppingCartItemDto> cartItems;
 }

@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: delete-user-id-column-shopping-cart-table
+      author: Vasyl Zeikan
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: shopping_carts
+            constraintName: shopping_cart_user
+
+        - dropColumn:
+            tableName: shopping_carts
+            columnName: user_id
+
+        - addForeignKeyConstraint:
+            baseColumnNames: id
+            baseTableName: shopping_carts
+            constraintName: shopping_cart_user
+            referencedColumnNames: id
+            referencedTableName: users

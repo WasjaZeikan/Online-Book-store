@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class CreateShoppingCartItemsDto {
+public class CreateShoppingCartItemDto {
     @NotNull
     private Long bookId;
     @NotNull
-    @Min(1L)
+    @Min(1)
     private Integer quantity;
 }

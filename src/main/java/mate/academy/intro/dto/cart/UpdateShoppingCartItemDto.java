@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class UpdateShoppingCartItemsDto {
+public class UpdateShoppingCartItemDto {
     @NotNull
-    @Min(1L)
+    @Min(1)
     private Integer quantity;
 }

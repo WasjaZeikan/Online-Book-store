@@ -4,10 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mate.academy.intro.dto.cart.CreateShoppingCartItemsDto;
+import mate.academy.intro.dto.cart.CreateShoppingCartItemDto;
 import mate.academy.intro.dto.cart.ShoppingCartDto;
-import mate.academy.intro.dto.cart.ShoppingCartItemsDto;
-import mate.academy.intro.dto.cart.UpdateShoppingCartItemsDto;
+import mate.academy.intro.dto.cart.ShoppingCartItemDto;
+import mate.academy.intro.dto.cart.UpdateShoppingCartItemDto;
+import mate.academy.intro.model.User;
 import mate.academy.intro.service.ShoppingCartService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -32,27 +33,29 @@ public class ShoppingCartController {
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "Get shopping cart", description = "Get a current user's shopping cart")
     public ShoppingCartDto getCurrentUserShoppingCart(Authentication authentication) {
-        return shoppingCartService.get(authentication);
+        User currentUser = (User) authentication.getPrincipal();
+        return shoppingCartService.getByUserId(currentUser.getId());
     }
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "Add book to shopping cart",
             description = "Add a book with specified id to current user's shopping cart")
-    public ShoppingCartItemsDto addBookToShoppingCart(Authentication authentication,
-            @Valid @RequestBody CreateShoppingCartItemsDto cartItemsDto) {
-        return shoppingCartService.addBookToShoppingCart(authentication, cartItemsDto);
+    public ShoppingCartItemDto addBookToShoppingCart(Authentication authentication,
+                                                     @Valid @RequestBody
+                                                     CreateShoppingCartItemDto cartItemsDto) {
+        User currentUser = (User) authentication.getPrincipal();
+        return shoppingCartService.addBookToShoppingCart(currentUser.getId(), cartItemsDto);
     }
 
     @PutMapping(value = "/cart-items/{cartItemId}")
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "Update book quantity",
             description = "Update the quantity of a book with a specified id")
-    public ShoppingCartItemsDto updateBookQuantity(Authentication authentication,
-                                                   @Valid @RequestBody
-                                                   UpdateShoppingCartItemsDto cartItemsDto,
-                                                   @PathVariable Long cartItemId) {
-        return shoppingCartService.updateBookQuantity(authentication, cartItemsDto, cartItemId);
+    public ShoppingCartItemDto updateBookQuantity(@Valid @RequestBody
+                                                   UpdateShoppingCartItemDto cartItemsDto,
+                                                  @PathVariable Long cartItemId) {
+        return shoppingCartService.updateBookQuantity(cartItemsDto, cartItemId);
     }
 
     @DeleteMapping(value = "/cart-items/{cartItemId}")

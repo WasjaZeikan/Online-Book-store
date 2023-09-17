@@ -67,6 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);
         ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setId(user.getId());
         shoppingCart.setUser(user);
         shoppingCartRepository.save(shoppingCart);
         return userMapper.toUserResponseDto(user);
