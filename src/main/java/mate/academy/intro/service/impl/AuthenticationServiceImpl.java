@@ -9,8 +9,10 @@ import mate.academy.intro.dto.user.UserResponseDto;
 import mate.academy.intro.exception.RegistrationException;
 import mate.academy.intro.mapper.UserMapper;
 import mate.academy.intro.model.Role;
+import mate.academy.intro.model.ShoppingCart;
 import mate.academy.intro.model.User;
 import mate.academy.intro.repository.RoleRepository;
+import mate.academy.intro.repository.ShoppingCartRepository;
 import mate.academy.intro.repository.UserRepository;
 import mate.academy.intro.security.JwtUtil;
 import mate.academy.intro.service.AuthenticationService;
@@ -31,6 +33,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final RoleRepository roleRepository;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final ShoppingCartRepository shoppingCartRepository;
 
     @Override
     public UserLoginResponseDto login(UserLoginRequestDto loginRequestDto) {
@@ -62,6 +65,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             user.setRoles(Set.of(userRole));
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userMapper.toUserResponseDto(userRepository.save(user));
+        user = userRepository.save(user);
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setId(user.getId());
+        shoppingCart.setUser(user);
+        shoppingCartRepository.save(shoppingCart);
+        return userMapper.toUserResponseDto(user);
     }
 }
