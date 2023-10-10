@@ -11,27 +11,24 @@ import mate.academy.intro.dto.book.CreateBookRequestDto;
 import mate.academy.intro.model.Book;
 import mate.academy.intro.model.Category;
 import mate.academy.intro.repository.CategoryRepository;
+import mate.academy.intro.util.ApplicationContextUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(config = MapperConfig.class)
-public abstract class BookMapper {
-    @Autowired
-    private CategoryRepository categoryRepository;
+public interface BookMapper {
+    BookDto toDto(Book book);
 
-    public abstract BookDto toDto(Book book);
+    Book toModel(CreateBookRequestDto requestDto);
 
-    public abstract Book toModel(CreateBookRequestDto requestDto);
-
-    public abstract Book updateBookFromDto(CreateBookRequestDto requestDto,
+    Book updateBookFromDto(CreateBookRequestDto requestDto,
                                            @MappingTarget Book book);
 
-    public abstract BookDtoWithoutCategoryIds toDtoWithoutCategories(Book book);
+    BookDtoWithoutCategoryIds toDtoWithoutCategories(Book book);
 
     @AfterMapping
-    protected void setCategoryIds(@MappingTarget BookDto bookDto, Book book) {
+    default void setCategoryIds(@MappingTarget BookDto bookDto, Book book) {
         Set<Category> categories = book.getCategories();
         List<Long> categoriesIds = new ArrayList<>(categories.size());
         for (Category category : categories) {
@@ -41,7 +38,9 @@ public abstract class BookMapper {
     }
 
     @AfterMapping
-    protected void setCategories(CreateBookRequestDto requestDto, @MappingTarget Book book) {
+    default void setCategories(CreateBookRequestDto requestDto, @MappingTarget Book book) {
+        CategoryRepository categoryRepository = ApplicationContextUtil.getApplicationContext()
+                .getBean(CategoryRepository.class);
         Set<Category> categories = new HashSet<>(categoryRepository
                 .findAllById(requestDto.getCategoryIds()));
         book.setCategories(categories);
