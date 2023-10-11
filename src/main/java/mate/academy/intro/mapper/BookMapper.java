@@ -10,8 +10,6 @@ import mate.academy.intro.dto.book.BookDtoWithoutCategoryIds;
 import mate.academy.intro.dto.book.CreateBookRequestDto;
 import mate.academy.intro.model.Book;
 import mate.academy.intro.model.Category;
-import mate.academy.intro.repository.CategoryRepository;
-import mate.academy.intro.util.ApplicationContextUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -39,10 +37,12 @@ public interface BookMapper {
 
     @AfterMapping
     default void setCategories(CreateBookRequestDto requestDto, @MappingTarget Book book) {
-        CategoryRepository categoryRepository = ApplicationContextUtil.getApplicationContext()
-                .getBean(CategoryRepository.class);
-        Set<Category> categories = new HashSet<>(categoryRepository
-                .findAllById(requestDto.getCategoryIds()));
+        Set<Category> categories = new HashSet<>();
+        for (Long id : requestDto.getCategoryIds()) {
+            Category category = new Category();
+            category.setId(id);
+            categories.add(category);
+        }
         book.setCategories(categories);
     }
 }
