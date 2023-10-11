@@ -10,11 +10,9 @@ import mate.academy.intro.dto.book.BookDtoWithoutCategoryIds;
 import mate.academy.intro.dto.book.CreateBookRequestDto;
 import mate.academy.intro.model.Book;
 import mate.academy.intro.model.Category;
-import mate.academy.intro.repository.CategoryRepository;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
-import org.springframework.web.context.ContextLoader;
 
 @Mapper(config = MapperConfig.class)
 public interface BookMapper {
@@ -22,7 +20,8 @@ public interface BookMapper {
 
     Book toModel(CreateBookRequestDto requestDto);
 
-    Book updateBookFromDto(CreateBookRequestDto requestDto, @MappingTarget Book book);
+    Book updateBookFromDto(CreateBookRequestDto requestDto,
+                                           @MappingTarget Book book);
 
     BookDtoWithoutCategoryIds toDtoWithoutCategories(Book book);
 
@@ -37,11 +36,13 @@ public interface BookMapper {
     }
 
     @AfterMapping
-    default void setCategories(CreateBookRequestDto requestDto,@MappingTarget Book book) {
-        CategoryRepository categoryRepository = ContextLoader.getCurrentWebApplicationContext()
-                .getBean(CategoryRepository.class);
-        Set<Category> categories = new HashSet<>(categoryRepository
-                .findAllById(requestDto.getCategoryIds()));
+    default void setCategories(CreateBookRequestDto requestDto, @MappingTarget Book book) {
+        Set<Category> categories = new HashSet<>();
+        for (Long id : requestDto.getCategoryIds()) {
+            Category category = new Category();
+            category.setId(id);
+            categories.add(category);
+        }
         book.setCategories(categories);
     }
 }
